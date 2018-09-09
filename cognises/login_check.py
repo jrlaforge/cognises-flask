@@ -130,7 +130,7 @@ def login_check(cognito_pool_region, cognito_pool_id):
                 return jsonify({'message': 'required credentials not passed'})
 
             # Retrieve the jwt used id token from the cookies
-            id_token = request.headers['Authentication']
+            id_token = request.headers['Authorization']
             print("Token is here in middleware: ", id_token)
 
             if id_token:
