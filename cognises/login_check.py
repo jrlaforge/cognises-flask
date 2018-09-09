@@ -141,14 +141,14 @@ def login_check(cognito_pool_region, cognito_pool_id):
 
                 except jwt.ExpiredSignatureError:
                     return jsonify({'message': 'token has expired',
-                                    'status': 401})
+                                    'status': 401}), status.HTTP_401_UNAUTHORIZED
 
                 except jwt.JWTError:
                     return jsonify({'message': 'token is invalid',
-                                    'status': 401})
+                                    'status': 401}), status.HTTP_401_UNAUTHORIZED
 
             else:
-                return jsonify({'message': 'token is missing', 'status': 400})
+                return jsonify({'message': 'token is missing', 'status': 400}), status.HTTP_400_BAD_REQUEST
 
             return t(details, *args, **kwargs)
 
