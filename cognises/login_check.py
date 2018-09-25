@@ -34,7 +34,12 @@ def get_user_email(aws_region, aws_user_pool, id_token):
     if aws_claims.get('token_use') != 'id':
         raise ValueError('Not an ID Token')
 
+    groups = []
+    if "cognito:groups" in payload:
+        groups = payload["cognito:groups"]
+
     return {'user_email': aws_claims.get('email'),
+            'groups': groups,
             'user_group': aws_claims.get('cognito:groups'),
             'status': 200, 'message': 'Validation successful'}
 
