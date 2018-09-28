@@ -70,7 +70,6 @@ def get_verified_claims(aws_region, aws_user_pool, token, audience=None):
         key,
         **kargs
     )
-    print("Claims: ", aws_claims)
 
     return aws_claims
 
@@ -110,8 +109,6 @@ def aws_key_dict(aws_pool_region, cognito_pool_id):
     for item in aws_jwt['keys']:
         result_dict[item['kid']] = item
 
-    print('Key dict result: ', result_dict)
-
     return result_dict
 
 
@@ -136,7 +133,6 @@ def login_check(cognito_pool_region, cognito_pool_id):
 
             # Retrieve the jwt used id token from the cookies
             id_token = request.headers['Authorization']
-            print("Token is here in middleware: ", id_token)
 
             if id_token:
                 try:
