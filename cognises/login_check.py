@@ -131,8 +131,10 @@ def login_check(cognito_pool_region, cognito_pool_id):
             if cognito_pool_region is None or cognito_pool_id is None:
                 return jsonify({'message': 'required credentials not passed'})
 
+            id_token = False
             # Retrieve the jwt used id token from the cookies
-            id_token = request.headers['Authorization']
+            if 'Authorization' in request.headers:
+                id_token = request.headers['Authorization']
 
             if id_token:
                 try:
