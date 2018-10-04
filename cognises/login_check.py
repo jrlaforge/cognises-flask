@@ -158,3 +158,57 @@ def login_check(cognito_pool_region, cognito_pool_id):
         return decorated_function
 
     return decorator
+
+def login_check_restrict(cognito_pool_region, cognito_pool_id, group_name):
+    """ A flask decorator to verify the user jwt id token stored in the cookies.
+
+    It takes aws cognito pool region and aws cognito pool id passed as arguments
+    to the decorator.
+
+    Returns: The email and the gruop the user exists in if the token passed is
+    valid else return the appropriate errors.
+
+    """
+    def decorator(t):
+        @wraps(t)
+        def decorated_function(*args, **kwargs):
+
+            # Check if the cognito pool region and pool id is passed as
+            # arguments to the decorator
+            if cognito_pool_region is None or cognito_pool_id is None:
+                return jsonify({'message': 'required credentials not passed'})
+
+            id_token = False
+            # Retrieve the jwt used id token from the cookies
+            if 'Authorization' in request.headers:
+                id_token = request.headers['Authorization']
+
+            if id_token:
+                try:
+                    aws_region = cognito_pool_region
+                    aws_pool = cognito_pool_id
+                    details = get_user_email(aws_region, aws_pool, id_token)
+
+                    if "groups" in details and group_name in details['groups']:
+                        return jsonify({'message': 'Restricted content',
+                                        'status': 401}), 401
+
+
+                except jwt.ExpiredSignatureError:
+                    return jsonify({'message': 'token has expired',
+                                    'status': 401}), 401
+
+                except jwt.JWTError:
+                    return jsonify({'message': 'token is invalid',
+                                    'status': 401}), 401
+
+
+
+            else:
+                return jsonify({'message': 'token is missing', 'status': 400}), 400
+
+            return t(details, *args, **kwargs)
+
+        return decorated_function
+
+    return decorator
